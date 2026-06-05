@@ -1,0 +1,10 @@
+.quiz-container { max-width: 500px; margin: 50px auto; padding: 20px; font-family: Arial, sans-serif; }
+.question-box h2 { font-size: 24px; }
+.question-box p { font-size: 20px; font-weight: bold; }
+.option-button {
+  display: block; width: 100%; padding: 15px; margin: 10px 0;
+  text-align: left; background: white; border: 1px solid #ddd;
+  border-radius: 4px; color: #007bff; cursor: pointer;
+}
+.option-button:hover { background-color: #f8f9fa; }
+.result-box { text-align: center; }
