@@ -12,7 +12,6 @@ import Form from "react-bootstrap/Form";
 
 function App() {
   return (
-    // Dùng màu nền tối bg-dark và chữ trắng text-white của hệ thống Bootstrap để khớp ảnh mẫu
     <div className="bg-dark text-white min-vh-100">
       {/* ==================== 1. COMPONENT NAVBAR (Trang 15) ==================== */}
       {/* expand="lg" giúp thanh menu tự động thu gọn mượt mà trên màn hình nhỏ */}
