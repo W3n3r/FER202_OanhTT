@@ -1,90 +1,173 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { checkAnswers, selectAnswer } from '../features/quiz/quizSlice';
+import {
+  goToNextQuestion,
+  goToPreviousQuestion,
+  selectAnswer,
+  showReview,
+  submitQuiz,
+} from '../features/quiz/quizSlice';
 
 function Quiz() {
   const dispatch = useDispatch();
-  const { questions, loading, checked, message } = useSelector(
-    (state) => state.quiz,
-  );
 
-  const getOptionClassName = (question, optionIndex) => {
+  const {
+    questions,
+    loading,
+    currentQuestionIndex,
+    submitted,
+  } = useSelector((state) => state.quiz);
+
+  if (loading) {
+    return (
+      <p className="status-message">
+        Loading quiz questions...
+      </p>
+    );
+  }
+
+  if (questions.length === 0) {
+    return (
+      <section className="quiz-section">
+        <p>There are no questions available.</p>
+      </section>
+    );
+  }
+
+  const currentQuestion = questions[currentQuestionIndex];
+
+  const getOptionClassName = (optionIndex) => {
     const classes = ['answer-option'];
-    const isSelected = question.selectedAnswer === optionIndex;
+
+    const isSelected =
+      currentQuestion.selectedAnswer === optionIndex;
 
     if (isSelected) {
       classes.push('selected');
     }
 
-    if (checked && optionIndex === question.correctAnswer) {
+    // Sau khi Submit thì hiển thị đáp án đúng và sai.
+    if (
+      submitted &&
+      optionIndex === currentQuestion.correctAnswer
+    ) {
       classes.push('correct');
     }
 
-    if (checked && isSelected && optionIndex !== question.correctAnswer) {
+    if (
+      submitted &&
+      isSelected &&
+      optionIndex !== currentQuestion.correctAnswer
+    ) {
       classes.push('incorrect');
     }
 
     return classes.join(' ');
   };
 
-  if (loading) {
-    return <p className="status-message">Loading quiz questions...</p>;
-  }
-
   return (
-    <section className="quiz-section" aria-labelledby="quiz-title">
-      <h2 id="quiz-title">Quiz Questions</h2>
+    <section className="quiz-section">
+      <div className="quiz-heading">
+        <h2>Quiz</h2>
 
-      {questions.map((question, questionIndex) => (
-        <article className="question-card" key={question.id}>
-          <h3>
-            {questionIndex + 1}. {question.questionText}
-          </h3>
+        <p className="progress-text">
+          Question {currentQuestionIndex + 1} of{' '}
+          {questions.length}
+        </p>
+      </div>
 
-          <div className="answers-list">
-            {question.options.map((option, optionIndex) => (
+      <article className="question-card">
+        <h3>
+          {currentQuestionIndex + 1}.{' '}
+          {currentQuestion.questionText}
+        </h3>
+
+        <div className="answers-list">
+          {currentQuestion.options.map(
+            (option, optionIndex) => (
               <label
-                className={getOptionClassName(question, optionIndex)}
-                key={`${question.id}-${optionIndex}`}
+                className={getOptionClassName(optionIndex)}
+                key={`${currentQuestion.id}-${optionIndex}`}
               >
                 <input
                   type="radio"
-                  name={`question-${question.id}`}
-                  checked={question.selectedAnswer === optionIndex}
+                  name={`question-${currentQuestion.id}`}
+                  checked={
+                    currentQuestion.selectedAnswer ===
+                    optionIndex
+                  }
+                  disabled={submitted}
                   onChange={() =>
                     dispatch(
                       selectAnswer({
-                        questionId: question.id,
+                        questionId: currentQuestion.id,
                         answerIndex: optionIndex,
                       }),
                     )
                   }
                 />
+
                 <span>{option}</span>
               </label>
-            ))}
-          </div>
-
-          {checked && (
-            <p className={question.isCorrect ? 'result correct-text' : 'result incorrect-text'}>
-              {question.isCorrect ? 'Correct answer.' : 'Incorrect answer.'}
-            </p>
+            ),
           )}
-        </article>
-      ))}
+        </div>
 
-      {questions.length > 0 && (
+        {submitted && (
+          <p
+            className={
+              currentQuestion.isCorrect
+                ? 'result correct-text'
+                : 'result incorrect-text'
+            }
+          >
+            {currentQuestion.isCorrect
+              ? 'Correct answer.'
+              : 'Incorrect answer.'}
+          </p>
+        )}
+      </article>
+
+      <div className="quiz-navigation">
         <button
-          className="check-button"
+          className="secondary-button"
           type="button"
-          onClick={() => dispatch(checkAnswers())}
+          disabled={currentQuestionIndex === 0}
+          onClick={() =>
+            dispatch(goToPreviousQuestion())
+          }
         >
-          Check Answers
+          Previous
         </button>
-      )}
 
-      {message && (
-        <p className={checked ? 'summary-message' : 'warning-message'}>{message}</p>
-      )}
+        <button
+          className="secondary-button"
+          type="button"
+          disabled={
+            currentQuestionIndex === questions.length - 1
+          }
+          onClick={() => dispatch(goToNextQuestion())}
+        >
+          Next
+        </button>
+      </div>
+
+      <div className="footer-actions">
+        <button
+          className="secondary-button"
+          type="button"
+          onClick={() => dispatch(showReview())}
+        >
+          Quiz Review
+        </button>
+
+        <button
+          className="submit-button"
+          type="button"
+          onClick={() => dispatch(submitQuiz())}
+        >
+          Submit
+        </button>
+      </div>
     </section>
   );
 }
