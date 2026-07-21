@@ -1,0 +1,16 @@
+/* Custom CSS cho component (LO4) */
+.custom-product-card {
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  border-radius: 12px;
+}
+.custom-product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15) !important;
+}
+.product-image {
+  height: 200px;
+  object-fit: contain;
+  padding: 15px;
+}
